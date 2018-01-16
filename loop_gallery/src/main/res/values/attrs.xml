@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <declare-styleable name="LoopGalleryByViewPager">
+        <!--是否循环-->
+        <attr name="isLoop" format="boolean"/>
+        <!-- Item的宽度 -->
+        <attr name="LoopGalleryByViewPager_itemWidth" format="dimension" />
+        <!-- Item的高度 -->
+        <attr name="LoopGalleryByViewPager_itemHeight" format="dimension" />
+    </declare-styleable>
+</resources>
