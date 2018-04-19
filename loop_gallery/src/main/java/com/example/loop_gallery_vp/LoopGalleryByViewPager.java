@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ public class LoopGalleryByViewPager extends FrameLayout {
     private int mDefaultPageIndex = 1;
     private ViewPager mViewPager;
     private OnItemClickListener mItemClickListener;
+    private ViewPager.OnPageChangeListener mOnPageChangeListener;
 
     public LoopGalleryByViewPager(@NonNull Context context) {
         super(context);
@@ -58,10 +60,54 @@ public class LoopGalleryByViewPager extends FrameLayout {
         LoopGalleryByViewPagerAdapter loopGalleryByViewPagerAdapter = new LoopGalleryByViewPagerAdapter();
         loopGalleryByViewPagerAdapter.setAdapter(aAdapter);
         mViewPager.setAdapter(loopGalleryByViewPagerAdapter);
-        if (mDefaultPageIndex == 0 && isLoop){  //循环的情况下默认选中第二页，因为第一页是最后一项
+        mViewPager.setOffscreenPageLimit(mViewPager.getChildCount());
+        if (mDefaultPageIndex == 0 && isLoop) {  //循环的情况下默认选中第二页，因为第一页是最后一项
             mDefaultPageIndex = 1;
         }
         mViewPager.setCurrentItem(mDefaultPageIndex, false);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                int newPosition = getRightPosition(position);
+                if (mOnPageChangeListener != null) {
+                    mOnPageChangeListener.onPageScrolled(newPosition, positionOffset, positionOffsetPixels);
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                int newPosition = getRightPosition(position);
+                if (mOnPageChangeListener != null) {
+                    mOnPageChangeListener.onPageSelected(newPosition);
+                }
+                final int count = mViewPager.getChildCount();
+                if (position == 0) {
+                    mViewPager.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mViewPager.setCurrentItem(count - 2, false);
+                        }
+                    }, 200);
+                }
+                if (position == count - 1) {
+                    mViewPager.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mViewPager.setCurrentItem(1, false);
+                        }
+                    }, 200);
+                }
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (mOnPageChangeListener != null) {
+                    mOnPageChangeListener.onPageScrollStateChanged(state);
+                }
+            }
+        });
+
     }
 
     /**
@@ -69,29 +115,7 @@ public class LoopGalleryByViewPager extends FrameLayout {
      * @param listener
      */
     public void addOnPageChangeListener(final ViewPager.OnPageChangeListener listener) {
-        if (listener == null || mViewPager == null) {
-            return;
-        }
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                int newPosition = getRightPosition(position);
-                listener.onPageScrolled(newPosition, positionOffset, positionOffsetPixels);
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                int newPosition = getRightPosition(position);
-                listener.onPageSelected(newPosition);
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                listener.onPageScrollStateChanged(state);
-            }
-        });
-
+        mOnPageChangeListener = listener;
     }
 
 

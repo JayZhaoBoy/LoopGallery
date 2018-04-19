@@ -1,8 +1,11 @@
 apply plugin: 'com.android.library'
 
+version = "1.0.0"
+group = "com.github.jayzhaoboy"
+
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         minSdkVersion 15
